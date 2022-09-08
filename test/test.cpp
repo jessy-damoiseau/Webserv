@@ -138,15 +138,21 @@ void add_clients(int *lst_socket, fd_set *rfd){
 void read_request(Client *client, size_t j){
     int valread;
     char data[BUFFER_SIZE + 1];
-    if ((valread = read(client->socket, data, BUFFER_SIZE)) <= 0){
+    std::cout << "check4" << std::endl;
+    if ((valread = read(client->socket, data, BUFFER_SIZE)) < 0){
+        
+        std::cout << "check5" << std::endl;
+        std::cout << "data : '" << data << "'" << std::endl;
         close(client->socket);
         vector_clients.erase(vector_clients.begin() + j);
         j--;
         return;
     }
     else{
+        std::cout << "check6" << std::endl;
         data[valread] = '\0';
     }
+    std::cout << "check7" << std::endl;
     std::cout << "data : '" << data << "'" << std::endl;
 }
 
@@ -168,7 +174,9 @@ int main(){
         
         config_fd(bc_sock, lst_socket, &rfd, &wfd);
         //std::cout << "bc_sock : " << bc_sock << ", clients : " << vector_clients.size() << std::endl;
+        std::cout << "check1" << std::endl;
         int activity = select(bc_sock + 1, &rfd, &wfd, NULL, NULL);
+        std::cout << "check2" << std::endl;
         if (activity < 0){
             std::cout << "Error: Fail select" << std::endl;
             perror("Select");
@@ -178,6 +186,7 @@ int main(){
         for (size_t i = 0; i < NB_SERVER; i++)
             for (size_t j = 0; j < vector_clients.size(); j++){
                 client = &vector_clients[j];
+                std::cout << "check3" << std::endl;
                 read_request(client, j);
             }
     }
