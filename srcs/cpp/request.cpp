@@ -46,6 +46,24 @@ void	request::parse() {
 		e.what();
 		_status = 400;
 	}
+	while (((line = getNextLine(_request, i)) != "") && _status != 400){
+		j = line.find_first_of(':');
+		if (j != std::string::npos){
+			key = line.substr(0, j);
+			key.erase(key.find_last_not_of(" \t") + 1);
+			key.erase(0, key.find_first_not_of(" \t"));
+			value = line.substr(j + 1, std::string::npos);
+			value.erase(value.find_last_not_of(" \t") + 1);
+			value.erase(0, value.find_first_not_of(" \t"));
+			_header[key] = value;
+		}
+		else
+			_status = 400;
+		if (_header.empty())
+			_status = 400;
+		if (_status == 200 && i != std::string::npos)
+			_body = _request.substr(i, std::string::npos);
+	}
 
 }
 
